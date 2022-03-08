@@ -8,7 +8,7 @@ const Home: NextPage = () => {
   const { width, height } = useWindowSize();
   const [login, setLogin] = useState("");
   const [isSubmit, setIsSubmit] = useState(false);
-  const [isConfetti, setIsConfetti] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = async () => {
@@ -22,12 +22,12 @@ const Home: NextPage = () => {
             login: login,
           }),
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         });
-        if (res.status === 200) {
-          setMessage("초대장 전송 성공!");
-          setIsConfetti(true);
+        if (res.ok) {
+          setMessage("초대장 전송 성공! - 이메일을 확인 해주세요!");
+          setIsSuccess(true);
         } else {
           setMessage((await res.json()).message);
         }
@@ -44,7 +44,7 @@ const Home: NextPage = () => {
 
   return (
     <div className="bg-yellow-400">
-      {isConfetti && <ReactConfetti width={width} height={height} />}
+      {isSuccess && <ReactConfetti width={width} height={height} />}
       <div className="flex flex-col justify-center min-h-screen mx-auto max-w-sm p-2 sm:p-0">
         <div className="flex flex-col gap-4 bg-white p-4 rounded border border-neutral-100">
           <div className="flex justify-center">
@@ -59,7 +59,7 @@ const Home: NextPage = () => {
           <hr />
           <div className="flex w-full">
             <input
-              disabled={isSubmit}
+              disabled={isSubmit || isSuccess}
               value={login}
               onChange={(e) => setLogin(e.target.value)}
               className="w-full border border-neutral-500 p-2 rounded-tl rounded-bl"
@@ -75,7 +75,7 @@ const Home: NextPage = () => {
           </p>
           <div className="flex justify-center">
             <button
-              disabled={isSubmit || !login.length}
+              disabled={isSubmit || !login.length || isSuccess}
               className="transition-colors bg-neutral-700 hover:bg-neutral-500 disabled:bg-neutral-300 text-white p-3 rounded"
               onClick={handleSubmit}
             >
